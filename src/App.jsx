@@ -8,8 +8,14 @@ function App() {
   };
 
   // gcTime = cashTime
-  const { data } = useQuery({ queryKey, queryFn, gcTime: 50000 });
-  console.log(data);
+  //isLoading => isPending && isFetching
+  const { data, isPending } = useQuery({
+    queryKey,
+    queryFn,
+    gcTime: 50000,
+    refetchOnWindowFocus: false,
+  });
+  console.log({ data, isPending });
 
   return <>app</>;
 }
