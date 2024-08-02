@@ -1,7 +1,9 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 function App() {
+  const queryClient = useQueryClient();
+
   const queryKey = ["posts"];
   const queryFn = () => {
     return axios.get("https://jsonplaceholder.typicode.com/posts");
@@ -9,14 +11,14 @@ function App() {
 
   // gcTime = cashTime
   //isLoading => isPending && isFetching
-  // const { data, isPending } = useQuery({
-  //   queryKey,
-  //   queryFn,
-  //   gcTime: 50000,
-  //   refetchOnWindowFocus: false,
-  // });
+  const { data, isPending } = useQuery({
+    queryKey,
+    queryFn,
+    gcTime: 50000,
+    refetchOnWindowFocus: false,
+  });
 
-  // console.log({ data, isPending });
+  console.log({ data });
 
   const mutationFn = (data) => {
     return axios.post("https://jsonplaceholder.typicode.com/posts", data);
@@ -28,11 +30,14 @@ function App() {
     };
 
     mutate(data, {
-      onError: () => console.log("error", error),
-      onSuccess: (data) => console.log("data", data),
+      onSuccess: () => {
+        console.log("Success", data),
+          queryClient.invalidateQueries({ queryKey: ["posts"] });
+      },
+      onError: (data) => console.log("error", error),
     });
   };
-  const { mutate, isPending } = useMutation({ mutationFn });
+  const { mutate } = useMutation({ mutationFn });
 
   return (
     <>
